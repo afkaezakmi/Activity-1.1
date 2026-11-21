@@ -3,12 +3,13 @@ import { NavLink, Link } from 'react-router-dom';
 import '../styles/Home.css';
 
 const STATIC_ITEMS = [
-  { id: '1', name: 'Industrial Barcode Scanner', sku: 'ELC-1001', category: 'Electronics', supplier: 'Apex Tech Supply', price: 129.00, qty: 34, minQty: 10, location: 'A-12' },
-  { id: '2', name: 'Thermal Shipping Labels (500/Roll)', sku: 'PKG-2040', category: 'Packaging', supplier: 'SwiftPack Logistics', price: 14.50, qty: 8, minQty: 15, location: 'B-03' },
-  { id: '3', name: 'Ergonomic Mesh Task Chair', sku: 'FRN-3012', category: 'Furniture', supplier: 'Nordic Office Co.', price: 245.00, qty: 12, minQty: 5, location: 'D-01' },
-  { id: '4', name: 'Heavy-Duty Corrugated Boxes (25pk)', sku: 'PKG-2011', category: 'Packaging', supplier: 'SwiftPack Logistics', price: 32.00, qty: 0, minQty: 12, location: 'B-08' },
-  { id: '5', name: 'USB-C Docking Station', sku: 'ELC-1088', category: 'Electronics', supplier: 'Apex Tech Supply', price: 89.99, qty: 19, minQty: 8, location: 'A-04' },
-  { id: '6', name: 'Steel Shelving Bolt Kit', sku: 'HRD-4090', category: 'Hardware', supplier: 'Titan Industrial', price: 18.75, qty: 6, minQty: 10, location: 'C-15' }
+  { id: '1', name: 'AMD Ryzen 7 7800X3D Processor', sku: 'CPU-7800X3D', category: 'Processors (CPU)', supplier: 'AMD Official Dist.', price: 389.00, qty: 18, minQty: 6, location: 'Bin A-01' },
+  { id: '2', name: 'NVIDIA RTX 4070 Super 12GB OC', sku: 'GPU-4070S', category: 'Graphics Cards', supplier: 'ASUS ROG Supply', price: 599.99, qty: 4, minQty: 5, location: 'Vault B-02' },
+  { id: '3', name: 'Corsair Vengeance 32GB (2x16GB) DDR5-6000', sku: 'RAM-DDR5-32', category: 'Memory (RAM)', supplier: 'Corsair Components', price: 114.50, qty: 26, minQty: 10, location: 'Bin A-08' },
+  { id: '4', name: 'Samsung 990 PRO 2TB NVMe M.2 SSD', sku: 'SSD-990P-2T', category: 'Storage (NVMe/SSD)', supplier: 'Samsung Tech Dist.', price: 169.00, qty: 0, minQty: 8, location: 'Bin A-12' },
+  { id: '5', name: 'MSI MAG B650 Tomahawk WiFi ATX', sku: 'MB-B650-TOM', category: 'Motherboards', supplier: 'MSI Distribution', price: 199.00, qty: 11, minQty: 4, location: 'Rack C-04' },
+  { id: '6', name: 'Seasonic Focus GX-850 80+ Gold Modular PSU', sku: 'PSU-GX850', category: 'Power Supplies', supplier: 'Seasonic Direct', price: 139.99, qty: 3, minQty: 6, location: 'Rack D-02' },
+  { id: '7', name: 'Thermalright Peerless Assassin 120 SE', sku: 'CLR-PA120', category: 'Cooling & Fans', supplier: 'Titan Cooling Co.', price: 35.90, qty: 22, minQty: 8, location: 'Bin C-09' }
 ];
 
 const EMPTY_FORM = { name: '', sku: '', category: '', supplier: '', price: '', qty: '', minQty: '', location: '' };
@@ -82,14 +83,14 @@ function Home() {
       location: formData.location.trim()
     };
     setInventory((prev) => [payload, ...prev]);
-    showToast('New product added');
+    showToast('Hardware component added');
     setFormData(EMPTY_FORM);
     setModalOpen(false);
   };
 
   const resetDemoData = () => {
     setInventory(STATIC_ITEMS);
-    showToast('Default values restored');
+    showToast('Default hardware catalog restored');
   };
 
   return (
@@ -99,12 +100,15 @@ function Home() {
           <div className="logo">
             <div className="logo-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <rect x="9" y="9" width="6" height="6" />
+                <line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" />
+                <line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" />
+                <line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" />
+                <line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
               </svg>
             </div>
-            <span>NexusStock</span>
+            <span>CoreRig Stock</span>
           </div>
           <button className="icon-btn mobile-only" onClick={() => setSidebarOpen(false)}>✕</button>
         </div>
@@ -121,7 +125,7 @@ function Home() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 7h-9" /><path d="M14 17H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" />
             </svg>
-            Inventory
+            PC Parts Catalog
             <span className="nav-badge">{metrics.alertCount}</span>
           </NavLink>
           <NavLink to="/stock-movements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
@@ -135,7 +139,7 @@ function Home() {
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            Suppliers
+            Distributors
           </NavLink>
         </nav>
 
@@ -149,43 +153,43 @@ function Home() {
           <div className="topbar-left">
             <button className="icon-btn mobile-only" onClick={() => setSidebarOpen(true)}>☰</button>
             <div>
-              <h1 className="page-title">Dashboard</h1>
-              <p className="page-subtitle">Overview of stock levels, valuation, and alerts</p>
+              <h1 className="page-title">Hardware Dashboard</h1>
+              <p className="page-subtitle">Overview of PC components, stock valuation, and RMA/restock alerts</p>
             </div>
           </div>
           <div className="topbar-actions">
-            <button className="btn btn-primary" onClick={() => setModalOpen(true)}>+ Add Item</button>
+            <button className="btn btn-primary" onClick={() => setModalOpen(true)}>+ Add Component</button>
           </div>
         </header>
 
         <section className="view-section active">
           <div className="kpi-grid">
             <div className="kpi-card">
-              <span className="kpi-label">Total Inventory Value</span>
+              <span className="kpi-label">Total Hardware Value</span>
               <strong className="kpi-value">${metrics.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
-              <span className="kpi-meta">{metrics.totalUnits.toLocaleString()} total units in warehouse</span>
+              <span className="kpi-meta">{metrics.totalUnits.toLocaleString()} components in stockroom</span>
             </div>
             <div className="kpi-card">
-              <span className="kpi-label">Active SKUs</span>
+              <span className="kpi-label">Active Part SKUs</span>
               <strong className="kpi-value">{inventory.length}</strong>
-              <span className="kpi-meta">Across {metrics.categories.length} categories</span>
+              <span className="kpi-meta">Across {metrics.categories.length} hardware categories</span>
             </div>
             <div className="kpi-card warning">
-              <span className="kpi-label">Low Stock Alerts</span>
+              <span className="kpi-label">Low Stock Parts</span>
               <strong className="kpi-value">{metrics.lowItems.length}</strong>
-              <span className="kpi-meta">Items at or below reorder point</span>
+              <span className="kpi-meta">Components below reorder level</span>
             </div>
             <div className="kpi-card danger">
               <span className="kpi-label">Out of Stock</span>
               <strong className="kpi-value">{metrics.outItems.length}</strong>
-              <span className="kpi-meta">Immediate restock required</span>
+              <span className="kpi-meta">Backordered / urgent restock</span>
             </div>
           </div>
 
           <div className="dashboard-grid">
             <div className="card">
               <div className="card-header">
-                <h2>Valuation by Category</h2>
+                <h2>Valuation by Component Category</h2>
               </div>
               <div className="category-bars">
                 {metrics.categoryTotals.map(({ cat, val }) => {
@@ -212,7 +216,7 @@ function Home() {
               </div>
               <div className="priority-list">
                 {metrics.priorityItems.length === 0 ? (
-                  <p className="muted-text">All items are adequately stocked.</p>
+                  <p className="muted-text">All hardware components are adequately stocked.</p>
                 ) : (
                   metrics.priorityItems.map((item) => {
                     const st = getStockStatus(item);
@@ -220,11 +224,11 @@ function Home() {
                       <div className="priority-item" key={item.id}>
                         <div>
                           <strong>{item.name}</strong>
-                          <div className="muted-text">{item.sku} • Reorder min: {item.minQty}</div>
+                          <div className="muted-text">{item.sku} • Min stock: {item.minQty}</div>
                         </div>
                         <div className="priority-actions">
                           <span className={`badge ${st.badge}`}>{item.qty} left</span>
-                          <button className="btn btn-sm btn-secondary" onClick={() => adjustStock(item.id, 10)}>+10</button>
+                          <button className="btn btn-sm btn-secondary" onClick={() => adjustStock(item.id, 5)}>+5</button>
                         </div>
                       </div>
                     );
@@ -240,47 +244,57 @@ function Home() {
         <div className="modal-backdrop open">
           <div className="modal">
             <div className="modal-header">
-              <h2>Add New Product</h2>
+              <h2>Add Hardware Component</h2>
               <button className="icon-btn" onClick={() => setModalOpen(false)}>✕</button>
             </div>
             <form onSubmit={handleAddSubmit} className="modal-body">
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Product Name *</label>
-                  <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                  <label>Component Name *</label>
+                  <input type="text" required placeholder="e.g., Intel Core i7-14700K" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>SKU Code *</label>
-                  <input type="text" required value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value })} />
+                  <label>Part SKU *</label>
+                  <input type="text" required placeholder="e.g., CPU-14700K" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Category *</label>
-                  <input type="text" required value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} />
+                  <input type="text" list="hwCategories" required placeholder="Processors (CPU)" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} />
+                  <datalist id="hwCategories">
+                    <option value="Processors (CPU)" />
+                    <option value="Graphics Cards" />
+                    <option value="Motherboards" />
+                    <option value="Memory (RAM)" />
+                    <option value="Storage (NVMe/SSD)" />
+                    <option value="Power Supplies" />
+                    <option value="Cooling & Fans" />
+                    <option value="PC Cases" />
+                  </datalist>
                 </div>
                 <div className="form-group">
-                  <label>Supplier *</label>
-                  <input type="text" required value={formData.supplier} onChange={(e) => setFormData({ ...formData, supplier: e.target.value })} />
+                  <label>Distributor *</label>
+                  <input type="text" required placeholder="e.g., ASUS ROG Supply" value={formData.supplier} onChange={(e) => setFormData({ ...formData, supplier: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Unit Price ($) *</label>
-                  <input type="number" step="0.01" min="0" required value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} />
+                  <input type="number" step="0.01" min="0" required placeholder="399.99" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>Current Quantity *</label>
-                  <input type="number" min="0" required value={formData.qty} onChange={(e) => setFormData({ ...formData, qty: e.target.value })} />
+                  <label>Quantity in Stock *</label>
+                  <input type="number" min="0" required placeholder="12" value={formData.qty} onChange={(e) => setFormData({ ...formData, qty: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Reorder Threshold *</label>
-                  <input type="number" min="0" required value={formData.minQty} onChange={(e) => setFormData({ ...formData, minQty: e.target.value })} />
+                  <input type="number" min="0" required placeholder="5" value={formData.minQty} onChange={(e) => setFormData({ ...formData, minQty: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>Bin Location</label>
-                  <input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+                  <label>ESD Bin / Rack Location</label>
+                  <input type="text" placeholder="e.g., Bin A-05" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
                 </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Product</button>
+                <button type="submit" className="btn btn-primary">Save Component</button>
               </div>
             </form>
           </div>
