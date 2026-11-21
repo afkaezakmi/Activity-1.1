@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import '../styles/Inventory.css';
 
-const STORAGE_KEY = 'nexus_stock_inventory_v1';
-const LOG_KEY = 'nexus_stock_logs_v1';
+const STATIC_ITEMS = [
+  { id: '1', name: 'Industrial Barcode Scanner', sku: 'ELC-1001', category: 'Electronics', supplier: 'Apex Tech Supply', price: 129.00, qty: 34, minQty: 10, location: 'A-12' },
+  { id: '2', name: 'Thermal Shipping Labels (500/Roll)', sku: 'PKG-2040', category: 'Packaging', supplier: 'SwiftPack Logistics', price: 14.50, qty: 8, minQty: 15, location: 'B-03' },
+  { id: '3', name: 'Ergonomic Mesh Task Chair', sku: 'FRN-3012', category: 'Furniture', supplier: 'Nordic Office Co.', price: 245.00, qty: 12, minQty: 5, location: 'D-01' },
+  { id: '4', name: 'Heavy-Duty Corrugated Boxes (25pk)', sku: 'PKG-2011', category: 'Packaging', supplier: 'SwiftPack Logistics', price: 32.00, qty: 0, minQty: 12, location: 'B-08' },
+  { id: '5', name: 'USB-C Docking Station', sku: 'ELC-1088', category: 'Electronics', supplier: 'Apex Tech Supply', price: 89.99, qty: 19, minQty: 8, location: 'A-04' },
+  { id: '6', name: 'Steel Shelving Bolt Kit', sku: 'HRD-4090', category: 'Hardware', supplier: 'Titan Industrial', price: 18.75, qty: 6, minQty: 10, location: 'C-15' }
+];
 
 const EMPTY_FORM = { name: '', sku: '', category: '', supplier: '', price: '', qty: '', minQty: '', location: '' };
 
 function Inventory() {
-  const [inventory, setInventory] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem(LOG_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  const [inventory, setInventory] = useState(STATIC_ITEMS);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -28,21 +25,9 @@ function Inventory() {
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [toastMsg, setToastMsg] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
-  }, [inventory]);
-
-  useEffect(() => {
-    localStorage.setItem(LOG_KEY, JSON.stringify(logs));
-  }, [logs]);
-
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 2800);
-  };
-
-  const addLog = (action, detail, delta = '—') => {
-    setLogs((prev) => [{ time: new Date().toLocaleString(), action, detail, delta }, ...prev].slice(0, 50));
   };
 
   const getStockStatus = (item) => {
@@ -72,11 +57,7 @@ function Inventory() {
       prev.map((item) => {
         if (item.id !== id) return item;
         const newQty = Math.max(0, item.qty + delta);
-        const actualDelta = newQty - item.qty;
-        if (actualDelta !== 0) {
-          addLog('Stock Adjusted', `${item.name} (${item.sku}) updated to ${newQty} units`, actualDelta > 0 ? `+${actualDelta}` : `${actualDelta}`);
-          showToast(`Updated ${item.sku} stock to ${newQty}`);
-        }
+        showToast(`Updated ${item.sku} stock to ${newQty}`);
         return { ...item, qty: newQty };
       })
     );
@@ -85,7 +66,6 @@ function Inventory() {
   const deleteItem = (item) => {
     if (!window.confirm(`Remove "${item.name}" from inventory?`)) return;
     setInventory((prev) => prev.filter((i) => i.id !== item.id));
-    addLog('Item Deleted', `Removed ${item.name} (${item.sku})`, `-${item.qty}`);
     showToast('Product removed');
   };
 
@@ -125,11 +105,9 @@ function Inventory() {
 
     if (editingId) {
       setInventory((prev) => prev.map((i) => (i.id === editingId ? { ...i, ...payload } : i)));
-      addLog('Item Updated', `Modified details for ${payload.name} (${payload.sku})`, 'Edit');
       showToast('Product updated');
     } else {
       setInventory((prev) => [{ id: Date.now().toString(), ...payload }, ...prev]);
-      addLog('Item Created', `Added ${payload.name} (${payload.sku})`, `+${payload.qty}`);
       showToast('New product added');
     }
     setModalOpen(false);
@@ -153,27 +131,27 @@ function Inventory() {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/" end className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/" end className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
               <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
             </svg>
             Dashboard
           </NavLink>
-          <NavLink to="/inventory" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/inventory" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 7h-9" /><path d="M14 17H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" />
             </svg>
             Inventory
             <span className="nav-badge">{alertCount}</span>
           </NavLink>
-          <NavLink to="/stock-movements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/stock-movements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
             Stock Movements
           </NavLink>
-          <NavLink to="/suppliers" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/suppliers" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />

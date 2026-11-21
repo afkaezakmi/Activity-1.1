@@ -1,11 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import '../styles/Home.css';
 
-const STORAGE_KEY = 'nexus_stock_inventory_v1';
-const LOG_KEY = 'nexus_stock_logs_v1';
-
-const DEFAULT_ITEMS = [
+const STATIC_ITEMS = [
   { id: '1', name: 'Industrial Barcode Scanner', sku: 'ELC-1001', category: 'Electronics', supplier: 'Apex Tech Supply', price: 129.00, qty: 34, minQty: 10, location: 'A-12' },
   { id: '2', name: 'Thermal Shipping Labels (500/Roll)', sku: 'PKG-2040', category: 'Packaging', supplier: 'SwiftPack Logistics', price: 14.50, qty: 8, minQty: 15, location: 'B-03' },
   { id: '3', name: 'Ergonomic Mesh Task Chair', sku: 'FRN-3012', category: 'Furniture', supplier: 'Nordic Office Co.', price: 245.00, qty: 12, minQty: 5, location: 'D-01' },
@@ -17,38 +14,15 @@ const DEFAULT_ITEMS = [
 const EMPTY_FORM = { name: '', sku: '', category: '', supplier: '', price: '', qty: '', minQty: '', location: '' };
 
 function Home() {
-  const [inventory, setInventory] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : DEFAULT_ITEMS;
-  });
-
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem(LOG_KEY);
-    return saved ? JSON.parse(saved) : [
-      { time: new Date().toLocaleString(), action: 'System Initialized', detail: 'Loaded default warehouse inventory catalog', delta: '—' }
-    ];
-  });
-
+  const [inventory, setInventory] = useState(STATIC_ITEMS);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [toastMsg, setToastMsg] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
-  }, [inventory]);
-
-  useEffect(() => {
-    localStorage.setItem(LOG_KEY, JSON.stringify(logs));
-  }, [logs]);
-
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 2800);
-  };
-
-  const addLog = (action, detail, delta = '—') => {
-    setLogs((prev) => [{ time: new Date().toLocaleString(), action, detail, delta }, ...prev].slice(0, 50));
   };
 
   const getStockStatus = (item) => {
@@ -88,11 +62,7 @@ function Home() {
       prev.map((item) => {
         if (item.id !== id) return item;
         const newQty = Math.max(0, item.qty + delta);
-        const actualDelta = newQty - item.qty;
-        if (actualDelta !== 0) {
-          addLog('Stock Adjusted', `${item.name} (${item.sku}) updated to ${newQty} units`, actualDelta > 0 ? `+${actualDelta}` : `${actualDelta}`);
-          showToast(`Updated ${item.sku} stock to ${newQty}`);
-        }
+        showToast(`Updated ${item.sku} stock to ${newQty}`);
         return { ...item, qty: newQty };
       })
     );
@@ -112,31 +82,14 @@ function Home() {
       location: formData.location.trim()
     };
     setInventory((prev) => [payload, ...prev]);
-    addLog('Item Created', `Added ${payload.name} (${payload.sku})`, `+${payload.qty}`);
     showToast('New product added');
     setFormData(EMPTY_FORM);
     setModalOpen(false);
   };
 
-  const exportCsv = () => {
-    const headers = ['SKU', 'Name', 'Category', 'Supplier', 'Unit Price', 'Quantity', 'Min Threshold', 'Location'];
-    const rows = inventory.map((i) => [i.sku, `"${i.name}"`, i.category, `"${i.supplier}"`, i.price, i.qty, i.minQty, i.location]);
-    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nexus-inventory-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('CSV exported');
-  };
-
   const resetDemoData = () => {
-    if (!window.confirm('Reset inventory back to default demo items?')) return;
-    setInventory(DEFAULT_ITEMS);
-    setLogs([{ time: new Date().toLocaleString(), action: 'Demo Reset', detail: 'Restored default catalog', delta: '—' }]);
-    showToast('Demo data restored');
+    setInventory(STATIC_ITEMS);
+    showToast('Default values restored');
   };
 
   return (
@@ -157,27 +110,27 @@ function Home() {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/" end className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/" end className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
               <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
             </svg>
             Dashboard
           </NavLink>
-          <NavLink to="/inventory" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/inventory" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 7h-9" /><path d="M14 17H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" />
             </svg>
             Inventory
             <span className="nav-badge">{metrics.alertCount}</span>
           </NavLink>
-          <NavLink to="/stock-movements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/stock-movements" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
             Stock Movements
           </NavLink>
-          <NavLink to="/suppliers" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+          <NavLink to="/suppliers" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
@@ -201,7 +154,6 @@ function Home() {
             </div>
           </div>
           <div className="topbar-actions">
-            <button className="btn btn-secondary" onClick={exportCsv}>Export CSV</button>
             <button className="btn btn-primary" onClick={() => setModalOpen(true)}>+ Add Item</button>
           </div>
         </header>
@@ -256,7 +208,7 @@ function Home() {
             <div className="card">
               <div className="card-header">
                 <h2>Restock Priority</h2>
-                <Link to="/inventory" className="link-btn" style={{ textDecoration: 'none' }}>View All</Link>
+                <Link to="/inventory" className="link-btn">View All</Link>
               </div>
               <div className="priority-list">
                 {metrics.priorityItems.length === 0 ? (
